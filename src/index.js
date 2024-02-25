@@ -10,7 +10,7 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
   const searchQuery = form.elements['searchQuery'].value.trim();
   if (searchQuery === '') {
-    Notiflix.Notify.Failure('Sorry, there are no images matching your search query. Please try again.');
+    Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     return;
   }
   page = 1;
@@ -24,15 +24,13 @@ async function fetchImages(searchQuery) {
 
   try {
     const response = await axios.get(url);
-    const { data } = response;
-    const { hits, totalHits } = data;
+    const { hits, totalHits } = response.data;
     if (hits.length === 0) {
-      Notiflix.Notify.Failure('Sorry, there are no images matching your search query. Please try again.');
+      Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
       return;
     }
     hits.forEach(image => {
-      const card = createPhotoCard(image);
-      gallery.appendChild(card);
+      appendImage(image);
     });
     if (totalHits > page * 40) {
       loadMoreBtn.style.display = 'block';
@@ -41,7 +39,7 @@ async function fetchImages(searchQuery) {
     }
   } catch (error) {
     console.error('Error fetching images:', error);
-    Notiflix.Notify.Failure('Oops! Something went wrong. Please try again.');
+    Notiflix.Notify.failure('Oops! Something went wrong. Please try again.');
   }
 }
 
@@ -50,6 +48,11 @@ loadMoreBtn.addEventListener('click', async () => {
   const searchQuery = form.elements['searchQuery'].value.trim();
   await fetchImages(searchQuery);
 });
+
+function appendImage(image) {
+  const card = createPhotoCard(image);
+  gallery.appendChild(card);
+}
 
 function createPhotoCard(image) {
   const card = document.createElement('div');
@@ -86,6 +89,7 @@ function createPhotoCard(image) {
 
   card.appendChild(info);
 
-  return card; 
+  return card;
 }
+
 
